@@ -5,8 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PaddleMovement : MonoBehaviour
 {
-    [SerializeField] private float _speed = 5.0f;
-
     private float _direction = 0.0f;
     [SerializeField] private KeyCode _RightDirection;
     [SerializeField] private KeyCode _LeftDirection;
@@ -25,8 +23,11 @@ public class PaddleMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        // Get paddle speed from Game Manager
+        float paddleSpeed = Gamebihave.Instance != null ? Gamebihave.Instance.paddleSpeed : 5.0f;
+        
         // apply the direction and speed to the rigidbody2D component
-        _rb.linearVelocity = new Vector2(_direction * _speed, _rb.linearVelocity.y);
+        _rb.linearVelocity = new Vector2(_direction * paddleSpeed, _rb.linearVelocity.y);
     }
 
     void Update()
