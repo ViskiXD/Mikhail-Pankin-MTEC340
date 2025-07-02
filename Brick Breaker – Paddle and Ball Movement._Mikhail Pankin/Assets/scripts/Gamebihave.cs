@@ -8,19 +8,23 @@ using TMPro;
 // and efficiently
 // this is a good example of a singleton pattern
 // because it ensures that there is only one instance of the class
-public class Gamebihave : MonoBehaviour
+public class GameBehavior : MonoBehaviour
 {
     // singleton instance
-    private static Gamebihave _instance;
+    private static GameBehavior _instance;
+
+    public Utilities.GameState CurrentState;
+
+    [SerializeField] private TMP_Text _messagesGUI;
 
     // singleton instance property
-    public static Gamebihave Instance
+    public static GameBehavior Instance
     {
         get
         {
             if (_instance == null)
             {
-                _instance = FindObjectOfType<Gamebihave>();
+                _instance = FindObjectOfType<GameBehavior>();
             }
             return _instance;
         }
@@ -31,7 +35,7 @@ public class Gamebihave : MonoBehaviour
     public float ballSpeedIncrease = 0.1f;
     public float ballSpeedIncreaseInterval = 10.0f;
     public float paddleInfluence = 0.5f;
-    public float ballSize = 1.0f;
+    public float ballSize = 0.25f;
     
     // score backing variable
     private int _score;
@@ -53,6 +57,16 @@ public class Gamebihave : MonoBehaviour
             else
             {
                 Debug.LogWarning("_scoreTextUI is null! Please assign a TextMeshPro UI component in the inspector.");
+                // Try to find a TextMeshPro component as fallback
+                if (_scoreTextUI == null)
+                {
+                    _scoreTextUI = FindObjectOfType<TextMeshProUGUI>();
+                    if (_scoreTextUI != null)
+                    {
+                        Debug.Log("Found TextMeshPro UI component automatically!");
+                        _scoreTextUI.text = _score.ToString();
+                    }
+                }
             }
         }
     }
@@ -79,6 +93,7 @@ public class Gamebihave : MonoBehaviour
     {
         // initialize score
         Score = 0;
+        CurrentState = Utilities.GameState.Play;
         
         // only update player scores if players exist (null check)
         if (_players != null)
@@ -90,6 +105,35 @@ public class Gamebihave : MonoBehaviour
                     p.Score = 0;
                 }
             }
+        }
+    }
+
+    private void Update()
+    {
+        // toggle pause/play with space key
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            switch (CurrentState)
+            {
+                case Utilities.GameState.Play:
+                    CurrentState = Utilities.GameState.Pause;
+                    if (_messagesGUI != null) _messagesGUI.enabled = true;
+                    break;
+                case Utilities.GameState.Pause:
+                    CurrentState = Utilities.GameState.Play;
+                    if (_messagesGUI != null) _messagesGUI.enabled = false;
+                    break;
+                case Utilities.GameState.GameOver:
+                    CurrentState = Utilities.GameState.Play;
+                    if (_messagesGUI != null) _messagesGUI.enabled = false;
+                    break;
+            }
+        }
+        // test scoring system with B key (changed from space to avoid conflict)
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            Debug.Log("B pressed - testing score increment");
+            ScorePoint(0);
         }
     }
 
@@ -107,16 +151,6 @@ public class Gamebihave : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        // test scoring system with space key
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("Space pressed - testing score increment");
-            ScorePoint(0);
-        }
-    }
-    
     // manual method to test scoring (can be called from other scripts or inspector)
     [ContextMenu("Test Score")]
     public void TestScore()
@@ -125,7 +159,3 @@ public class Gamebihave : MonoBehaviour
         ScorePoint(0);
     }
 }
-
-
-//I really tried to fix it in any possible way, but I couldn't find the issue. my score in just not updating. I am soory but i will
-//submit it as is. Cause I just Can't find the issue AT ALL.

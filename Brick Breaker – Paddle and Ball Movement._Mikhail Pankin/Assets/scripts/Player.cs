@@ -11,7 +11,8 @@ public class Player : MonoBehaviour
         set
         {
             _score = value;
-            _scoreGUI.text = Score.ToString();
+            if (_scoreGUI != null)
+                _scoreGUI.text = Score.ToString();
         }
     }
 

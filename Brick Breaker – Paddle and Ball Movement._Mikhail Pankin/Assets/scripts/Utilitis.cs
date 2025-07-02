@@ -1,8 +1,30 @@
 using UnityEngine;
 
 // This class contains utility functions that are used throughout the game
-public static class Utilitis
+public static class Utilities
 {
+
+    public enum GameState
+    {
+        Play, Pause, GameOver
+    }
+
+
+    public static Color[] colors =
+    {
+        
+        Color.green,
+        Color.blue,
+        Color.yellow,
+        Color.cyan,
+        Color.white,
+        Color.gray,
+    };
+
+
+
+
+
     // Generate a random float that's not zero to ensure the ball always moves
     //methods are static because they are not associated with any particular instance of the class
     //and can be called without creating an instance of the class

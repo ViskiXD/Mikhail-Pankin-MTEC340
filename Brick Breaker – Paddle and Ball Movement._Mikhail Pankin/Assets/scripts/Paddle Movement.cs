@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -24,7 +22,7 @@ public class PaddleMovement : MonoBehaviour
     void FixedUpdate()
     {
         // Get paddle speed from Game Manager
-        float paddleSpeed = Gamebihave.Instance != null ? Gamebihave.Instance.paddleSpeed : 5.0f;
+        float paddleSpeed = GameBehavior.Instance != null ? GameBehavior.Instance.paddleSpeed : 5.0f;
         
         // apply the direction and speed to the rigidbody2D component
         _rb.linearVelocity = new Vector2(_direction * paddleSpeed, _rb.linearVelocity.y);
@@ -37,6 +35,5 @@ public class PaddleMovement : MonoBehaviour
 
         if (Input.GetKey(_RightDirection)) _direction += 1.0f;
         if (Input.GetKey(_LeftDirection)) _direction -= 1.0f;
-    
     }
 }
