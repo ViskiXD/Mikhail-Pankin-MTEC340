@@ -1,14 +1,10 @@
 using UnityEngine;
 
-public class Egg : MonoBehaviour
+public class RedEgg : MonoBehaviour
 {
-    [SerializeField] private float _fallSpeed = 2.0f;
-    
+    private float _fallSpeed = 2.0f;
     private Rigidbody2D _rb;
     private AudioSource _audioSource;
-    
-    [SerializeField] private AudioClip _catchClip;
-    [SerializeField] private AudioClip _missClip;
     
     // Pause system variables
     private Vector2 _pausedVelocity;
@@ -20,7 +16,7 @@ public class Egg : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _rb = GetComponent<Rigidbody2D>();
         
-        // Set up physics similar to ball behavior
+        // Set up physics similar to regular egg
         _rb.linearDamping = 0.0f;
         _rb.angularDamping = 0.1f;
         _rb.gravityScale = 1.0f;
@@ -31,7 +27,7 @@ public class Egg : MonoBehaviour
     
     void Update()
     {
-        // Handle pause/unpause for eggs
+        // Handle pause/unpause for red eggs
         if (EggGameManager.Instance != null)
         {
             bool isPaused = EggGameManager.Instance.IsPaused();
@@ -43,7 +39,7 @@ public class Egg : MonoBehaviour
                 _pausedVelocity = _rb.linearVelocity;
                 _pausedAngularVelocity = _rb.angularVelocity;
                 
-                // Freeze the egg
+                // Freeze the red egg
                 _rb.linearVelocity = Vector2.zero;
                 _rb.angularVelocity = 0f;
                 _rb.bodyType = RigidbodyType2D.Kinematic;
@@ -65,40 +61,45 @@ public class Egg : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Player")) // Pallet catches egg
+        if (other.gameObject.CompareTag("Player")) // Pallet catches red egg
         {
-            // Increment score
+            // Trigger explosion effect!
             if (EggGameManager.Instance != null)
             {
-                EggGameManager.Instance.ScorePoint();
+                EggGameManager.Instance.TriggerExplosion();
             }
             
-            if (_audioSource && _catchClip)
+            // Play explosion sound if audio source exists (optional)
+            if (_audioSource != null)
             {
-                _audioSource.PlayOneShot(_catchClip);
+                // Try to play a simple beep sound or use existing audio
+                _audioSource.pitch = 0.5f; // Lower pitch for explosion effect
+                _audioSource.Play();
             }
             
-            // Destroy the egg
+            // Destroy the red egg
             Destroy(gameObject);
         }
-        else if (other.gameObject.CompareTag("Ground")) // Egg hits ground (missed)
+        else if (other.gameObject.CompareTag("Ground")) // Red egg hits ground (missed)
         {
-            if (_audioSource && _missClip)
+            // Play miss sound if audio source exists (optional)
+            if (_audioSource != null)
             {
-                _audioSource.PlayOneShot(_missClip);
+                _audioSource.pitch = 1.0f; // Normal pitch
+                _audioSource.Play();
             }
             
-            // Destroy the egg
+            // Destroy the red egg
             Destroy(gameObject);
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Handle slope collisions - eggs should bounce/roll naturally
+        // Handle slope collisions - red eggs should bounce/roll naturally
         if (collision.gameObject.CompareTag("Slope"))
         {
             // Let physics handle the slope interaction naturally
         }
     }
-}
+} 

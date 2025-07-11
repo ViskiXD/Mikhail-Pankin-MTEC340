@@ -21,11 +21,14 @@ public class Pallet : MonoBehaviour
     {
         HandleInput();
         
+        // Don't move if game is paused or exploded
+        if (EggGameManager.Instance != null && (EggGameManager.Instance.IsPaused() || EggGameManager.Instance.IsExploded())) return;
+        
         // Move towards target position if not already there
         if (_positions[_currentPosition] != null)
         {
             Vector3 targetPos = _positions[_currentPosition].position;
-            targetPos.y = transform.position.y; // Keep Y position
+            // Allow both X and Y movement to reach all 4 positions
             
             if (Vector3.Distance(transform.position, targetPos) > 0.1f)
             {
@@ -43,6 +46,9 @@ public class Pallet : MonoBehaviour
     private void HandleInput()
     {
         if (_isMoving) return; // Don't accept new input while moving
+        
+        // Don't accept input if game is paused or exploded
+        if (EggGameManager.Instance != null && (EggGameManager.Instance.IsPaused() || EggGameManager.Instance.IsExploded())) return;
         
         // Simple input handling like brick breaker
         if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.Alpha1))
@@ -68,6 +74,11 @@ public class Pallet : MonoBehaviour
         if (positionIndex >= 0 && positionIndex < _positions.Length && _positions[positionIndex] != null)
         {
             _currentPosition = positionIndex;
+            Debug.Log($"Moving to position {positionIndex}");
+        }
+        else
+        {
+            Debug.LogWarning($"Cannot move to position {positionIndex} - Transform is null or invalid!");
         }
     }
     
