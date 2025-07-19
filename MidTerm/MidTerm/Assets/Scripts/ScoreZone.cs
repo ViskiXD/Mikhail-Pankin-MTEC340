@@ -13,8 +13,10 @@ public class ScoreZone : MonoBehaviour
     
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Check if an egg entered the zone
-        if (other.GetComponent<Egg>() != null)
+        // Check if an egg entered the zone (but skip red eggs - they shouldn't trigger score penalty)
+        if (other.GetComponent<Egg>() != null || 
+            other.GetComponent<BlueEgg>() != null || other.GetComponent<OrangeEgg>() != null ||
+            other.GetComponent<GreenEgg>() != null || other.GetComponent<PurpleEgg>() != null)
         {
             // Get the egg's rigidbody
             Rigidbody2D eggRb = other.GetComponent<Rigidbody2D>();
@@ -24,10 +26,10 @@ public class ScoreZone : MonoBehaviour
                 // Apply crazy jump forces
                 ApplyCrazyJump(eggRb);
                 
-                // Deduct score point
+                // Deduct 500 score points for missing an egg
                 if (EggGameManager.Instance != null)
                 {
-                    EggGameManager.Instance.LosePoint();
+                    EggGameManager.Instance.LoseBigPoints();
                 }
                 
                 // Play jump sound
@@ -37,21 +39,32 @@ public class ScoreZone : MonoBehaviour
                 }
             }
         }
+        // Red eggs just pass through without penalty or jump effects
+        else if (other.GetComponent<RedEgg>() != null)
+        {
+            // Red eggs are ignored - no score penalty, no jump effects
+            Debug.Log("Red egg passed through score zone - no penalty applied");
+        }
     }
     
     private void ApplyCrazyJump(Rigidbody2D eggRb)
     {
-        // Add random variation to make it "crazy"
-        float randomJumpForce = _jumpForce + Random.Range(-_randomVariation, _randomVariation);
-        float randomHorizontalForce = Random.Range(-_horizontalForce, _horizontalForce);
+        // Calculate random jump force with variation
+        float randomHorizontal = Random.Range(-_randomVariation, _randomVariation);
+        float randomVertical = Random.Range(-_randomVariation/2, _randomVariation);
         
-        // Apply upward and random horizontal force
-        Vector2 jumpVector = new Vector2(randomHorizontalForce, randomJumpForce);
-        eggRb.linearVelocity = Vector2.zero; // Reset velocity first
-        eggRb.AddForce(jumpVector, ForceMode2D.Impulse);
+        Vector2 jumpDirection = new Vector2(
+            _horizontalForce + randomHorizontal,
+            _jumpForce + randomVertical
+        );
         
-        // Add some random angular velocity for extra craziness
+        // Apply the force
+        eggRb.AddForce(jumpDirection, ForceMode2D.Impulse);
+        
+        // Add some random spin for extra craziness
         float randomSpin = Random.Range(-10f, 10f);
         eggRb.angularVelocity = randomSpin;
+        
+        Debug.Log($"Applied crazy jump force: {jumpDirection} with spin: {randomSpin}");
     }
 } 

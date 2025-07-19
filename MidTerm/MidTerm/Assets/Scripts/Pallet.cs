@@ -50,6 +50,9 @@ public class Pallet : MonoBehaviour
         // Don't accept input if game is paused or exploded
         if (EggGameManager.Instance != null && (EggGameManager.Instance.IsPaused() || EggGameManager.Instance.IsExploded())) return;
         
+        // Don't accept input if pallet is frozen (orange egg effect)
+        if (EggGameManager.Instance != null && EggGameManager.Instance.IsPalletFrozen()) return;
+        
         // Simple input handling like brick breaker
         if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.Alpha1))
         {
